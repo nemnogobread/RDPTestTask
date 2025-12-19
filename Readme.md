@@ -54,9 +54,9 @@ Otherwise check for a confirmation dialog on your device.
 ```
 Её удалось исправть на `API 30 "R"; Android 11` установив именно `Google APIs` образ. Правда подгружать vk.video пришлось прямым монтированием apk
 
-### Кнопка `search` в vk.video
+### resource-id в vk.video
 
-Предпологалось, что её имя `com.vk.vkvideo:id/search`, однако тесты падали с указанием не то, что такого элемента не находили:
+Предпологалось, что имя, допустим, кнопки поиска, было по типу `com.vk.vkvideo:id/search`, однако тесты падали с указанием не то, что такого элемента не находили:
 ```bash
 Caused by: org.openqa.selenium.NoSuchElementException: An element could not be located on the page using the given search parameters.
 For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
@@ -66,4 +66,4 @@ Driver info: io.appium.java_client.android.AndroidDriver
 Command: [3a622ad5-0070-4c1d-b327-836dfcc2c5f6, findElement {using=id, value=com.vk.vkvideo:id/search}]
 ```
 
-По итогу пришлось устанавливать ещё Appium Inspector, подключаться через него к эмулятору и смотреть какой resource-id у кнопки поиска. Оказалось, что `com.vk.vkvideo:id/search_button`
+По итогу пришлось устанавливать ещё Appium Inspector, подключаться через него к эмулятору и смотреть какой resource-id у кнопки поиска. Оказалось, что `com.vk.vkvideo:id/search_button`. Аналогично с другими элементами.

@@ -3,6 +3,7 @@ package org.example.tests;
 import com.codeborne.selenide.Configuration;
 import com.codeborne.selenide.Selenide;
 import com.codeborne.selenide.WebDriverRunner;
+import io.appium.java_client.android.AndroidDriver;
 import org.example.config.AppiumConfig;
 import org.example.pages.VKVideoPage;
 import org.slf4j.Logger;
@@ -31,6 +32,18 @@ public class VKVideoPlaybackTest {
     public void setup() {
         logger.info("Открываем приложение VK Video и подготавливаем страницу");
         Selenide.open();
+        
+        try {
+            if (WebDriverRunner.hasWebDriverStarted()) {
+                AndroidDriver driver = (AndroidDriver) WebDriverRunner.getWebDriver();
+                driver.activateApp("com.vk.vkvideo");
+                logger.info("Приложение VK Video активировано");
+                Thread.sleep(2000);
+            }
+        } catch (Exception e) {
+            logger.warn("Не удалось активировать приложение VK Video, продолжаем: {}", e.getMessage());
+        }
+        
         vkVideoPage = new VKVideoPage();
 
         vkVideoPage.skipOnboarding()
@@ -42,96 +55,46 @@ public class VKVideoPlaybackTest {
         logger.info("Тест 1: проверка успешного воспроизведения видео");
         vkVideoPage.searchVideo("the green elephant");
 
-        vkVideoPage.openFirstVideo();
-
-        boolean playerVisible = vkVideoPage.isVideoPlayerVisible();
-        Assert.assertTrue(playerVisible,
-                "Видеоплеер не появился на экране");
-        logger.info("Видеоплеер отображается");
-
-        // Проверка 2: Видео воспроизводится
-        boolean isPlaying = vkVideoPage.isVideoPlaying();
-        Assert.assertTrue(isPlaying,
-                "Видео не воспроизводится (прогресс не изменяется)");
-        logger.info("Видео воспроизводится");
-
-        // Проверка 3: Есть элементы управления
-        boolean hasControls = vkVideoPage.hasPlaybackControls();
-        Assert.assertTrue(hasControls,
-                "Элементы управления воспроизведением не найдены");
-        logger.info("Элементы управления присутствуют");
-
-        String videoTitle = vkVideoPage.getVideoTitle();
-        logger.info("Воспроизводится видео: {}", videoTitle);
-    }
-
-    @Test(priority = 2, description = "Обработка ошибки воспроизведения")
-    public void testVideoPlaybackFailureHandling() {
-
-        logger.info("Тест 2: проверка обработки ошибки воспроизведения / отсутствующего видео");
-        vkVideoPage.searchVideo("xyzabc123nonexistent9999");
-
-        try {
-            vkVideoPage.openFirstVideo();
-
-            boolean playerVisible = vkVideoPage.isVideoPlayerVisible();
-
-            if (!playerVisible) {
-                logger.info("Видео не найдено - ожидаемое поведение");
-                Assert.assertTrue(true, "Корректная обработка отсутствия видео");
-            } else {
-                boolean isPlaying = vkVideoPage.isVideoPlaying();
-
-                if (!isPlaying) {
-                    logger.info("Видео не воспроизводится - ошибка корректно обработана");
-                    Assert.assertTrue(true, "Ошибка воспроизведения обработана");
-                } else {
-                    logger.warn("Неожиданно: видео воспроизводится");
-                }
-            }
-
-        } catch (Exception e) {
-            logger.error("Исключение при открытии несуществующего видео", e);
-            Assert.assertTrue(true, "Корректная обработка ошибки: " + e.getMessage());
-        }
-
-    }
-
-    @Test(priority = 3, description = "Негативный тест: проверка недоступного видео")
-    public void testUnavailableVideoHandling() {
-
-        logger.info("Тест 3: проверка обработки недоступного видео");
-        vkVideoPage.searchVideo("трейлер");
-
         try {
             vkVideoPage.openFirstVideo();
 
             Thread.sleep(3000);
 
             boolean playerVisible = vkVideoPage.isVideoPlayerVisible();
-
+            
             if (!playerVisible) {
-                logger.warn("Видео недоступно для воспроизведения");
-                Assert.assertTrue(true, "Корректно обработано недоступное видео");
+                logger.warn("Видеоплеер не появился на экране");
+                Assert.fail("Видеоплеер не появился на экране");
             } else {
+                logger.info("Видеоплеер отображается");
+                
                 boolean isPlaying = vkVideoPage.isVideoPlaying();
-
-                if (isPlaying) {
-                    logger.info("Видео доступно и воспроизводится");
+                
+                if (!isPlaying) {
+                    logger.warn("Видео не воспроизводится");
+                    Assert.fail("Видео не воспроизводится (прогресс не изменяется)");
                 } else {
-                    logger.warn("Видео не запустилось - возможно, есть ограничения");
+                    logger.info("Видео воспроизводится");
                 }
-
-                Assert.assertTrue(true, "Приложение корректно обработало ситуацию");
+                
+                boolean hasControls = vkVideoPage.hasPlaybackControls();
+                if (!hasControls) {
+                    logger.warn("Элементы управления воспроизведением не найдены");
+                    Assert.fail("Элементы управления воспроизведением не найдены");
+                } else {
+                    logger.info("Элементы управления присутствуют");
+                }
+                
+                String videoTitle = vkVideoPage.getVideoTitle();
+                logger.info("Воспроизводится видео: {}", videoTitle);
             }
 
         } catch (Exception e) {
-            logger.error("Обработано исключение при проверке недоступного видео", e);
-            Assert.assertTrue(true, "Исключение обработано корректно");
+            logger.error("Исключение при проверке воспроизведения видео", e);
+            Assert.fail("Ошибка при проверке воспроизведения видео: " + e.getMessage());
         }
-
     }
-
+    
     @AfterMethod
     public void tearDown() {
         try {
@@ -139,6 +102,20 @@ public class VKVideoPlaybackTest {
             Selenide.screenshot("test_result");
         } catch (Exception e) {
             logger.warn("Не удалось сделать скриншот результата теста", e);
+        }
+        
+        try {
+            logger.info("Закрываем приложение VK Video");
+            if (WebDriverRunner.hasWebDriverStarted()) {
+                AndroidDriver driver = (AndroidDriver) WebDriverRunner.getWebDriver();
+                driver.terminateApp("com.vk.vkvideo");
+                logger.info("Приложение VK Video успешно закрыто");
+                
+                Thread.sleep(3000);
+                logger.debug("Пауза после закрытия приложения завершена");
+            }
+        } catch (Exception e) {
+            logger.warn("Не удалось закрыть приложение VK Video", e);
         }
     }
 

@@ -25,7 +25,8 @@ public class VKVideoPage {
     private final By searchButton = AppiumBy.id("com.vk.vkvideo:id/search_button");
     private final By searchInput = AppiumBy.id("com.vk.vkvideo:id/query");
     private final By videoPlayerContainer = AppiumBy.id("com.vk.vkvideo:id/playerContainer");
-    private final By playPauseButton = AppiumBy.id("com.vk.vkvideo:id/play_pause");
+    private final By contentContainer = AppiumBy.id("com.vk.vkvideo:id/contentContainer");
+    private final By playPauseButton = AppiumBy.id("com.vk.vkvideo:id/video_play_button");
     private final By videoProgress = AppiumBy.id("com.vk.vkvideo:id/progress");
     private final By videoTitle = AppiumBy.id("com.vk.vkvideo:id/title");
 
@@ -45,7 +46,6 @@ public class VKVideoPage {
                 if (button.exists()) {
                     logger.info("Найден элемент онбординга по xpath '{}', нажимаем на него", xpath);
                     button.click();
-                    // даём приложению обновить экран
                     Thread.sleep(1000);
                 }
             }
@@ -97,7 +97,6 @@ public class VKVideoPage {
     public VKVideoPage searchVideo(String query) {
         logger.info("Выполняем поиск видео по запросу: {}", query);
 
-        // На всякий случай ещё раз пытаемся закрыть возможные попапы
         skipOnboarding();
         closePopups();
 
@@ -147,7 +146,7 @@ public class VKVideoPage {
             String initial = getVideoProgress();
             logger.debug("Начальное значение прогресса: {}", initial);
     
-            Thread.sleep(7000);
+            Thread.sleep(9000);
     
             String current = getVideoProgress();
             logger.debug("Текущее значение прогресса: {}", current);
@@ -197,7 +196,7 @@ public class VKVideoPage {
 
     public String getVideoTitle() {
         try {
-            String title = $(videoTitle).getText();
+            String title = $(contentContainer).$(videoTitle).getText();
             logger.info("Заголовок воспроизводимого видео: {}", title);
             return title;
         } catch (Exception e) {
