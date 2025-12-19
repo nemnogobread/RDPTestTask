@@ -60,7 +60,7 @@ Otherwise check for a confirmation dialog on your device.
 
 ### resource-id в vk.video
 
-Предпологалось, что имя, допустим, кнопки поиска, было по типу `com.vk.vkvideo:id/search`, однако тесты падали с указанием не то, что такого элемента не находили:
+Предпологалось, что имя, допустим, кнопки поиска, было по типу `com.vk.vkvideo:id/search`, однако тесты падали с указанием на то, что такого элемента не находили:
 ```bash
 Caused by: org.openqa.selenium.NoSuchElementException: An element could not be located on the page using the given search parameters.
 For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
