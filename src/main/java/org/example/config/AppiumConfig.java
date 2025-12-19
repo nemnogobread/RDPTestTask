@@ -22,7 +22,6 @@ public class AppiumConfig implements WebDriverProvider {
     private static final String PLATFORM_VERSION = "11.0";
     private static final String DEVICE_NAME = "emulator-5554";
     private static final String APP_PACKAGE = "com.vk.vkvideo";
-    private static final String APP_ACTIVITY = "com.vkontakte.android.MainActivity";
 
     @Nonnull
     @Override
@@ -38,9 +37,7 @@ public class AppiumConfig implements WebDriverProvider {
         options.setAutomationName("UiAutomator2");
 
         options.setAppPackage(APP_PACKAGE);
-        //options.setAppActivity(APP_ACTIVITY);
 
-        // Запускаем приложение в уже авторизованном состоянии (если вы один раз вошли вручную)
         options.setNoReset(true);
         options.setFullReset(false);
         options.setNewCommandTimeout(Duration.ofSeconds(300));
