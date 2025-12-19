@@ -52,7 +52,7 @@ This adb server's $ADB_VENDOR_KEYS is not set
 Try 'adb kill-server' if that seems wrong.
 Otherwise check for a confirmation dialog on your device.
 ```
-Её удалось исправть на `API 30 "R"; Android 11` установив именно `Google APIs` образ. Правда подгружать vk.video пришлось прямым монтированием apk
+Её удалось исправть на `API 30 "R"; Android 11` установив именно `Google APIs` образ. Правда подгружать vk.video пришлось прямым монтированием apk, так как `Google Play Store` здесь не было.
 
 ### resource-id в vk.video
 
